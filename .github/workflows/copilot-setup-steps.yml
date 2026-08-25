@@ -1,5 +1,16 @@
-on: env:
+name: Copilot Setup Steps
+
+on:
   push:
     branches:
-    - main
-    - release/*
+      - main
+      - release/*
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Setup steps go here"
