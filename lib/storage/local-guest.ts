@@ -49,7 +49,8 @@ export class LocalGuestStorage implements StorageAdapter {
     await mkdir(this.#scopeRoot, { recursive: true, mode: 0o700 });
     const identifier = randomUUID();
     const filename = sanitizeStorageFilename(input.filename);
-    const relativePath = path.join(this.#sessionId, this.#runId, `${identifier}-${filename}`);
+    // Public storage paths are portable identifiers, so keep them POSIX-style.
+    const relativePath = path.posix.join(this.#sessionId, this.#runId, `${identifier}-${filename}`);
 
     return {
       assetId: input.assetId,
