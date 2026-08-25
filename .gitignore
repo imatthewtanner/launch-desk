@@ -1,0 +1,98 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Node.js and package managers
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# JavaScript and TypeScript build outputs
+.next/
+out/
+dist/
+build/
+coverage/
+.turbo/
+.nx/
+.vite/
+storybook-static/
+*.tsbuildinfo
+next-env.d.ts
+
+# Deployment tooling
+.vercel/
+.wrangler/
+.dev.vars
+.output/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# .NET
+[Bb]in/
+[Oo]bj/
+.vs/
+TestResults/
+artifacts/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.nupkg
+*.snupkg
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Temporary and cache files
+.cache/
+.tmp/
+temp/
+tmp/
+*.tmp
+*.temp
+*.bak
+
+# AutoCAD working and recovery files
+*.ac$
+*.dwl
+*.dwl2
+*.sv$
