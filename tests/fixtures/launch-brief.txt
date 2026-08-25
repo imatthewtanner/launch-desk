@@ -1,0 +1,2 @@
+Launch Atlas to existing engineering manager customers through a staged rollout.
+Success means teams create a shared weekly delivery report without support assistance.

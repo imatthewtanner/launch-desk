@@ -1,39 +1,130 @@
 # Launch Desk
 
-Launch Desk is the home of the Launch Desk project. This repository is initialized and ready for application scaffolding.
+Launch Desk turns a rough product brief into an engineering release plan that a team can execute. The agent streams its work into a polished Mission Control UI and returns:
 
-## Status
+- a readiness score and prioritized plan;
+- a concrete risk register;
+- owner-specific checklists;
+- channel-specific launch copy;
+- material follow-up questions for missing evidence.
 
-Initial repository setup.
+It uses the current OpenAI Agents SDK and Responses API patterns—not the deprecated Assistants API or legacy Chat Completions scaffolding. The default model is `gpt-5.6-terra`, with `OPENAI_MODEL` available as an override. See the [OpenAI model catalog](https://developers.openai.com/api/docs/models).
 
-## Getting Started
+## Architecture
+
+```mermaid
+flowchart LR
+    UI["Mission Control UI"] --> API["Next.js stream route"]
+    API --> Agent["Agents SDK runner"]
+    Agent --> Tools["Launch tools"]
+    API --> Store["Supabase or guest store"]
+    Agent --> Trace["OpenAI tracing"]
+```
+
+| Area | Location | Responsibility |
+|---|---|---|
+| Frontend | `components/`, `hooks/`, `app/page.tsx` | Intake, uploads, progressive activity, result tabs, refinement, cancellation |
+| API | `app/api/` | Launch creation, signed uploads, NDJSON agent streaming |
+| Agent | `lib/agent/` | Instructions, Agents SDK setup, SDK event normalization, safe errors |
+| Tools | `lib/tools/` | Task extraction, readiness rubric, owner checklists, channel copy |
+| Contracts | `lib/contracts/` | Zod schemas for requests, results, assets, and stream events |
+| Persistence | `lib/server/`, `lib/storage/`, `lib/supabase/` | Guest adapters and authenticated Supabase repositories |
+| Tests | `tests/` | Unit, component, integration, prompt-injection, and browser journeys |
+
+The browser consumes newline-delimited JSON from `POST /api/agent/plan`. Sequence numbers are strictly increasing. Events include run lifecycle, tool progress, model text deltas, structured partials, follow-up questions, usage, completion, and safe terminal errors.
+
+## Agent tools
+
+- `extract_launch_tasks` converts rough requirements into normalized, prioritized work with owners, dependencies, acceptance criteria, and evidence sources.
+- `check_launch_readiness` scores explicit evidence against a launch rubric and separates blockers, warnings, and missing details.
+- `generate_owner_checklists` groups normalized tasks into actionable owner views.
+- `draft_channel_copy` adapts grounded copy for release notes, email, in-app, social, internal, and support channels while flagging claims that need confirmation.
+
+Add a new tool in `lib/tools/`, export it from `lib/tools/registry.ts`, describe its required use in `lib/agent/instructions.ts`, and cover the deterministic behavior in `tests/unit/tools/`.
+
+## Local setup
+
+Requirements: Node.js 22+, npm, and an OpenAI API key.
 
 ```bash
 git clone https://github.com/imatthewtanner/launch-desk.git
 cd launch-desk
+npm install
+cp .env.example .env.local
 ```
 
-Create a feature branch before adding application code:
+Set `OPENAI_API_KEY` in `.env.local`. Never prefix it with `NEXT_PUBLIC_` or commit it. For the fastest local path, keep guest mode enabled:
+
+```dotenv
+OPENAI_API_KEY=your_server_side_key
+OPENAI_MODEL=gpt-5.6-terra
+LAUNCH_DESK_GUEST_MODE=true
+OPENAI_TRACING_DISABLED=false
+```
+
+Then start the app:
 
 ```bash
-git switch -c feature/initial-scaffold
+npm run dev -- --hostname 127.0.0.1
 ```
 
-Development and build commands will be added after the application framework is selected.
+Open `http://127.0.0.1:3000`.
 
-## Environment Configuration
+### Supabase workspace mode
 
-Keep local configuration and secrets in `.env.local`. Do not commit API keys, access tokens, passwords, or production credentials.
+Set `LAUNCH_DESK_GUEST_MODE=false`, create a Supabase project, and configure:
 
-When environment variables are introduced, add a safe `.env.example` containing variable names and placeholder values only.
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+SUPABASE_SECRET_KEY=your_server_secret_key
+```
 
-## Repository Conventions
+Apply the SQL files in `supabase/migrations/` in filename order. They create launches, assets, run history, row-level security, owner-scoped foreign keys, and private storage policies. Magic-link authentication redirects through `/auth/callback`.
 
-- Keep generated files, build outputs, local settings, and secrets out of source control.
-- Use focused branches and descriptive commits.
-- Submit changes through pull requests.
-- Update this README as setup and deployment workflows are added.
+Guest mode uses an in-memory launch repository plus a session-scoped local asset adapter. It is intended for local development and automated tests, not durable production data.
+
+## Commands
+
+```bash
+npm test                 # unit, component, integration, and adversarial tests
+npm run test:e2e         # desktop and mobile Chromium journey
+npm run typecheck        # TypeScript without emit
+npm run lint             # ESLint
+npm run build            # production Next.js build
+npm run verify:live      # real streamed POST through the local API
+```
+
+`npm run verify:live` expects a running guest-mode server and reads `LAUNCH_DESK_BASE_URL` when the server is not at `http://127.0.0.1:3000`. It creates a launch, posts to the real agent route, reads the stream to completion, and fails unless it sees at least one `tool.progress`, one nonempty `text.delta`, and one `run.completed` event.
+
+Example:
+
+```bash
+LAUNCH_DESK_BASE_URL=http://127.0.0.1:3000 npm run verify:live
+```
+
+The repository also includes `/api/test/agent-stream`, a deterministic non-production fixture used by the Playwright journey. In a production build it returns 404 unless `ENABLE_TEST_STREAM_FIXTURE=true` is explicitly set.
+
+## Observability and safety
+
+- OpenAI tracing is enabled by default and can be disabled with `OPENAI_TRACING_DISABLED=true`.
+- Trace metadata includes run, launch, actor, model, and tool timing—but excludes prompts, asset contents, and secrets.
+- Assets and all user-provided fields are wrapped as untrusted evidence. Agent instructions explicitly reject embedded role changes, secret requests, and completion claims without evidence.
+- The API persists completed, partial, failed, and cancelled outcomes. Client cancellation preserves streamed partial text.
+- Only supported MIME types are accepted, filenames are sanitized, files are capped at 20 MB, and authenticated storage paths are owner-scoped.
+
+## Deployment
+
+Create a Vercel project from this repository and set the variables from `.env.example` in Vercel Project Settings. Keep all secrets server-only. For durable team workspaces, use `LAUNCH_DESK_GUEST_MODE=false` and provide the Supabase variables. For a disposable preview, guest mode may be enabled.
+
+Run the full validation gate before promotion:
+
+```bash
+npm test && npm run typecheck && npm run lint && npm run build
+```
+
+Then deploy a preview, exercise the browser flow, inspect runtime errors, and promote the same validated artifact. See [docs/validation-checklist.md](docs/validation-checklist.md) for the release checklist.
 
 ## License
 
-No license has been selected yet.
+MIT

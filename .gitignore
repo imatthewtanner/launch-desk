@@ -87,6 +87,11 @@ $RECYCLE.BIN/
 .tmp/
 temp/
 tmp/
+.worktrees/
+.superpowers/
+test-results/
+playwright-report/
+.launch-desk-tmp/
 *.tmp
 *.temp
 *.bak
