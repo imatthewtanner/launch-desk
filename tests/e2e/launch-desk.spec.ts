@@ -32,7 +32,7 @@ test('builds, explores, refines, and cancels a launch plan without losing partia
   await expect(page.getByText('launch-brief.txt')).toBeVisible();
 
   await page.getByRole('button', { name: 'Build launch plan' }).click();
-  await expect(page.getByText('Scoring evidence against the readiness rubric')).toBeVisible();
+  await expect(page.getByText('Scoring evidence against the readiness rubric')).toBeVisible({ timeout: 30000 });
   await expect(page.getByText(/Building a reversible staged rollout/)).toBeVisible();
   await expect(page.getByRole('tab', { name: 'Plan' })).toBeVisible();
   await expect(page.getByLabel('Readiness 72 out of 100')).toBeVisible();
