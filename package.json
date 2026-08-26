@@ -1,10 +1,11 @@
 {
-  "name": "launch-desk",
+  "name": "@imatthewtanner/launch-desk",
   "version": "1.0.0",
   "description": "A launch-planning agent for engineering teams.",
   "private": false,
-    "publishConfig": {
+  "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
