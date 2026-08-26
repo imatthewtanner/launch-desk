@@ -217,7 +217,12 @@ export function useLaunchStream(
       abortRef.current = controller;
       let lastSequence = 0;
       let terminal = false;
-      setState({ ...initialState, status: 'connecting' });
+      setState({
+        ...initialState,
+        status: 'connecting',
+        result: payload.priorResult ?? null,
+        followUps: payload.priorResult?.followUpQuestions ?? [],
+      });
 
       try {
         const response = await fetcher(endpoint, {
