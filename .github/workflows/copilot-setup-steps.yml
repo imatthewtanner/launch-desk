@@ -13,10 +13,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -27,24 +27,63 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v7
+      - name: Validate Next.js build outputs
+        run: |
+          echo "Validating required Next.js build outputs..."
+          test -d .next/static  || { echo "ERROR: .next/static is missing"; exit 1; }
+          test -d .next/server  || { echo "ERROR: .next/server is missing"; exit 1; }
+          echo "Required build outputs are present."
+
+      - name: Upload static output
+        uses: actions/upload-artifact@v4
         with:
-          name: build-output
-          path: .next/
+          name: next-build-output-static
+          path: .next/static
+          retention-days: 7
+
+      - name: Upload server output
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build-output-server
+          path: .next/server
+          retention-days: 7
+
+      - name: Upload types output (if present)
+        if: ${{ hashFiles('.next/types') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build-output-types
+          path: .next/types
+          retention-days: 7
+
+      - name: Upload standalone output (if present)
+        if: ${{ hashFiles('.next/standalone') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build-output-standalone
+          path: .next/standalone
           retention-days: 7
 
   setup:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v8
+      - name: Download static output
+        uses: actions/download-artifact@v4
         with:
-          name: build-output
-          path: .next/
+          name: next-build-output-static
+          path: .next/static
+
+      - name: Download server output
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build-output-server
+          path: .next/server
 
       - name: Verify artifact download
         run: |
-          echo "Artifact downloaded successfully"
+          echo "Verifying downloaded Next.js build outputs..."
+          test -d .next/static || { echo "ERROR: .next/static missing after download"; exit 1; }
+          test -d .next/server || { echo "ERROR: .next/server missing after download"; exit 1; }
+          echo "Build outputs verified successfully."
           ls -la .next/
