@@ -125,6 +125,19 @@ npm test && npm run typecheck && npm run lint && npm run build
 
 Then deploy a preview, exercise the browser flow, inspect runtime errors, and promote the same validated artifact. See [docs/validation-checklist.md](docs/validation-checklist.md) for the release checklist.
 
+## MCP App
+
+The repository also contains a standalone, npm-based MCP App in [`mcp-app/`](mcp-app/). It reviews engineering launch readiness from plan, file, GitHub, and Linear evidence, then presents an approval-gated flow for creating recommended issues.
+
+```bash
+npm run mcp:typecheck
+npm run mcp:test
+npm run mcp:build
+npm run mcp:dev
+```
+
+See [`mcp-app/README.md`](mcp-app/README.md) for provider credentials, optional OAuth and Supabase persistence, MCP connection details, approval guarantees, and the validation checklist.
+
 ## License
 
 MIT
