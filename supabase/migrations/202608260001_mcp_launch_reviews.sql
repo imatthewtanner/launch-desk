@@ -28,5 +28,9 @@ alter table public.mcp_issue_previews enable row level security;
 revoke all on public.mcp_launch_reviews from anon, authenticated;
 revoke all on public.mcp_issue_previews from anon, authenticated;
 
+grant usage on schema public to service_role;
+grant select, insert, update, delete on public.mcp_launch_reviews to service_role;
+grant select, insert, update, delete on public.mcp_issue_previews to service_role;
+
 comment on table public.mcp_launch_reviews is 'Server-owned MCP launch review payloads, partitioned by verified subject.';
 comment on table public.mcp_issue_previews is 'Server-owned immutable approval previews and idempotent issue creation results.';

@@ -7,7 +7,11 @@ export default defineConfig([
   ...nextTypeScript,
   globalIgnores([
     '.next/**',
+    '.vinext/**',
     'coverage/**',
+    'dist/**',
+    'mcp-app/.vercel/**',
+    'mcp-app/dist/**',
     'playwright-report/**',
     'test-results/**',
     'next-env.d.ts',

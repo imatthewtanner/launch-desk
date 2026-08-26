@@ -92,6 +92,8 @@ npm run test:e2e         # desktop and mobile Chromium journey
 npm run typecheck        # TypeScript without emit
 npm run lint             # ESLint
 npm run build            # production Next.js build
+npm run build:vinext     # Cloudflare Workers build
+npm run start:vinext     # preview the built Worker locally
 npm run verify:live      # real streamed POST through the local API
 ```
 
@@ -115,12 +117,32 @@ The repository also includes `/api/test/agent-stream`, a deterministic non-produ
 
 ## Deployment
 
-Create a Vercel project from this repository and set the variables from `.env.example` in Vercel Project Settings. Keep all secrets server-only. For durable team workspaces, use `LAUNCH_DESK_GUEST_MODE=false` and provide the Supabase variables. For a disposable preview, guest mode may be enabled.
+The production target is Cloudflare Workers through vinext. Authenticate Wrangler, then add the production values without committing them:
+
+```bash
+npx wrangler login
+npx wrangler secret put OPENAI_API_KEY
+npx wrangler secret put NEXT_PUBLIC_SUPABASE_URL
+npx wrangler secret put NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+npx wrangler secret put SUPABASE_SECRET_KEY
+npx wrangler secret put LAUNCH_DESK_GUEST_MODE # enter false
+```
+
+`OPENAI_MODEL` and `OPENAI_TRACING_DISABLED` are optional Worker secrets. Production guest mode is intentionally rejected; the Worker must use the durable Supabase workspace. `wrangler.jsonc` enables Node.js compatibility, Workers Cache for the vinext CDN adapter, static assets, and Worker observability.
+
+Build and deploy:
+
+```bash
+npm run build:vinext
+npm run deploy:vinext
+```
+
+Keep `.env.local` for local development only. For CI, inject the same values through the CI secret store before the Cloudflare build or deployment step.
 
 Run the full validation gate before promotion:
 
 ```bash
-npm test && npm run typecheck && npm run lint && npm run build
+npm test && npm run typecheck && npm run lint && npm run build && npm run build:vinext
 ```
 
 Then deploy a preview, exercise the browser flow, inspect runtime errors, and promote the same validated artifact. See [docs/validation-checklist.md](docs/validation-checklist.md) for the release checklist.
