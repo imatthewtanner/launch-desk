@@ -69,13 +69,13 @@ jobs:
     needs: build
     steps:
       - name: Download static output
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: next-build-output-static
           path: .next/static
 
       - name: Download server output
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: next-build-output-server
           path: .next/server
