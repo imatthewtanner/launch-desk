@@ -160,6 +160,24 @@ npm run mcp:dev
 
 See [`mcp-app/README.md`](mcp-app/README.md) for provider credentials, optional OAuth and Supabase persistence, MCP connection details, approval guarantees, and the validation checklist.
 
+## Codex plugin
+
+The repo-local plugin in [`plugins/launch-desk/`](plugins/launch-desk/) packages the readiness-review skill, branded assets, and the local MCP connection. Install MCP dependencies and start the server first:
+
+```bash
+npm --prefix mcp-app install
+./plugins/launch-desk/scripts/start-mcp.sh
+```
+
+The plugin connects to `http://127.0.0.1:3000/mcp`. In another terminal, add this repository as a local marketplace and install the plugin:
+
+```bash
+codex plugin marketplace add "$PWD"
+codex plugin add launch-desk@personal
+```
+
+Start a new Codex thread after installation so the skill and MCP tools are discovered. If the plugin is copied outside the repository, set `LAUNCH_DESK_REPO` to the absolute path of the Launch Desk clone before running its start script.
+
 ## License
 
 MIT

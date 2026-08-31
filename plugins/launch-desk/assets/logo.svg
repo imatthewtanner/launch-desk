@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" role="img" aria-labelledby="title">
+  <title id="title">Launch Desk</title>
+  <rect width="80" height="80" rx="20" fill="#2F6BFF"/>
+  <path d="M22 54h36M28 47l12-25 12 25-12-6-12 6Z" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="100" y="51" fill="#172033" font-family="Arial, sans-serif" font-size="34" font-weight="700">Launch Desk</text>
+</svg>

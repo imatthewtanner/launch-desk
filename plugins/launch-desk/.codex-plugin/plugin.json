@@ -1,0 +1,42 @@
+{
+  "name": "launch-desk",
+  "version": "0.1.0",
+  "description": "Review engineering launch plans and turn approved readiness actions into GitHub or Linear issues.",
+  "author": {
+    "name": "Matthew Tanner",
+    "url": "https://github.com/imatthewtanner"
+  },
+  "homepage": "https://github.com/imatthewtanner/launch-desk",
+  "repository": "https://github.com/imatthewtanner/launch-desk",
+  "license": "MIT",
+  "keywords": [
+    "engineering",
+    "launch-readiness",
+    "github",
+    "linear"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Launch Desk",
+    "shortDescription": "Review engineering launch readiness.",
+    "longDescription": "Evaluate launch plans against a structured readiness rubric, inspect supporting evidence, identify prioritized gaps and missing owners, and create approved follow-up issues.",
+    "developerName": "Matthew Tanner",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write with approval"
+    ],
+    "websiteURL": "https://github.com/imatthewtanner/launch-desk",
+    "brandColor": "#2F6BFF",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/logo.svg",
+    "logoDark": "./assets/logo-dark.svg",
+    "defaultPrompt": [
+      "Review this engineering launch plan for readiness gaps.",
+      "Show the highest-priority risks and missing owners.",
+      "Prepare approved next actions as GitHub or Linear issues."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}

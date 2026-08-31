@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Launch Readiness"
+  short_description: "Evaluate engineering launch plans and close readiness gaps"
+  default_prompt: "Review this engineering launch plan for gaps, risks, missing owners, and next actions."
