@@ -17,4 +17,5 @@ if [[ ! -d "$mcp_dir/node_modules" ]]; then
   exit 1
 fi
 
+export PORT="${PORT:-3117}"
 exec npm --prefix "$mcp_dir" start

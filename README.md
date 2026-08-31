@@ -169,7 +169,7 @@ npm --prefix mcp-app install
 ./plugins/launch-desk/scripts/start-mcp.sh
 ```
 
-The plugin connects to `http://127.0.0.1:3000/mcp`. In another terminal, add this repository as a local marketplace and install the plugin:
+The plugin connects to `http://127.0.0.1:3117/mcp`, avoiding the main app's default port. In another terminal, add this repository as a local marketplace and install the plugin:
 
 ```bash
 codex plugin marketplace add "$PWD"
