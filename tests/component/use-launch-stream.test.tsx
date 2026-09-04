@@ -210,4 +210,31 @@ describe('useLaunchStream', () => {
     act(() => hook.current.cancel());
     await waitFor(() => expect(hook.current.state.status).toBe('cancelled'));
   });
+
+  it('preserves the prior result when a refinement run is cancelled', async () => {
+    const fetcher = vi.fn(
+      (_url: RequestInfo | URL, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener(
+            'abort',
+            () => reject(new DOMException('Aborted', 'AbortError')),
+            { once: true },
+          );
+        }),
+    );
+    const { result: hook } = renderHook(() => useLaunchStream(fetcher));
+
+    act(() => {
+      void hook.current.start({
+        ...payload,
+        parentRunId: 'run-1',
+        priorResult: result,
+      });
+    });
+
+    await waitFor(() => expect(hook.current.state.result).toEqual(result));
+    act(() => hook.current.cancel());
+    await waitFor(() => expect(hook.current.state.status).toBe('cancelled'));
+    expect(hook.current.state.result).toEqual(result);
+  });
 });
